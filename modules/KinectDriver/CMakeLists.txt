@@ -18,7 +18,8 @@ aux_source_directory(${SRC_DIR} SRC_LIST)
 # 指定头文件目录
 include_directories(
 	${INC_DIR}
-	${PROJECT_SOURCE_DIR}/include)
+	${PROJECT_SOURCE_DIR}/include
+	../Core/inc)
 
 link_directories(${LIB_DIR_LIST})
 
@@ -29,16 +30,15 @@ add_library(${TARGET_NAME} SHARED ${SRC_LIST})
 add_library(${TARGET_NAME_STATIC} STATIC ${SRC_LIST})
 
 # 指定静态库的输出名称
-set_target_properties(${TARGET_NAME_STATIC} PROPERTIES OUTPUT_NAME "${TARGET_NAME}")
+# set_target_properties(${TARGET_NAME_STATIC} PROPERTIES OUTPUT_NAME "${TARGET_NAME}")
 
 # 使动态库和静态库同时存在
 set_target_properties(${TARGET_NAME} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(${TARGET_NAME_STATIC} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 # 添加需要引用的静态库
-foreach(mylib ${LIB_DIR_LIST})
-message(${mylib})
-FILE(GLOB_RECURSE LIB_LIST "${mylib}/*.lib")
+foreach(libs ${LIB_DIR_LIST})
+FILE(GLOB_RECURSE LIB_LIST "${libs}/*.lib")
 target_link_libraries(${TARGET_NAME} ${LIB_LIST})
 endforeach()
 

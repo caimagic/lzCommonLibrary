@@ -5,9 +5,9 @@ set(INC_DIR inc)
 set(BIN_DIR bin)
 
 if(USE_32BITS)
-set(LIB_DIR lib/x86)
+set(LIB_DIR_LIST lib/x86)
 else()
-set(LIB_DIR lib/x64)
+set(LIB_DIR_LIST lib/x64)
 endif(USE_32BITS)
 
 # 指定代码目录
@@ -19,7 +19,7 @@ include_directories(
 	${INC_DIR}
 	${PROJECT_SOURCE_DIR}/include)
 
-link_directories(${LIB_DIR})
+link_directories(${LIB_DIR_LIST})
 
 # 生成动态库目标
 add_library(${TARGET_NAME} SHARED ${SRC_LIST})
@@ -28,15 +28,17 @@ add_library(${TARGET_NAME} SHARED ${SRC_LIST})
 add_library(${TARGET_NAME_STATIC} STATIC ${SRC_LIST})
 
 # 指定静态库的输出名称
-set_target_properties(${TARGET_NAME_STATIC} PROPERTIES OUTPUT_NAME "${TARGET_NAME}")
+# set_target_properties(${TARGET_NAME_STATIC} PROPERTIES OUTPUT_NAME "${TARGET_NAME}")
 
 # 使动态库和静态库同时存在
 set_target_properties(${TARGET_NAME} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(${TARGET_NAME_STATIC} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
-FILE(GLOB_RECURSE LIB_LIST "${LIB_DIR}/*.lib")
-
+# 添加需要引用的静态库
+foreach(libs ${LIB_DIR_LIST})
+FILE(GLOB_RECURSE LIB_LIST "${libs}/*.lib")
 target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+endforeach()
 
 install(TARGETS ${TARGET_NAME} ${TARGET_NAME_STATIC}
 	RUNTIME DESTINATION bin

@@ -4,6 +4,7 @@
 #include "Version.h"
 #include "lzTypes.h"
 #include "Kinect.h"
+#include "ICapture.h"
 
 #define KINECT_DRIVER_DEPTH_WIDTH	512
 #define KINECT_DRIVER_DEPTH_HEIGHT	424
@@ -59,8 +60,15 @@ typedef struct
 	lzPoint2f uv3;
 } Kinect_Driver_Mesh_Type;
 
-LZ_EXPORTS_API int fnLZ_KinectDriver(void);
 
+class CKinectDriver
+{
+public:
+	CKinectDriver();
+	~CKinectDriver();
+	ICapture *pCapture;
+};
+	
 // open kinect 
 LZ_EXPORTS_API lzBool lzKinectDriverOpenSensor(void);
 

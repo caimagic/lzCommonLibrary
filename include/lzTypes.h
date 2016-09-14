@@ -150,6 +150,16 @@ typedef struct
 /*			8 Function Declare																*/
 /********************************************************************************************/
 
+// Safe release for interfaces
+template<class Interface>
+inline void SafeRelease(Interface *& pInterfaceToRelease)
+{
+	if (pInterfaceToRelease != NULL)
+	{
+		pInterfaceToRelease->Release();
+		pInterfaceToRelease = NULL;
+	}
+}
 
 #endif // _LZ_TYPES_H__
 

@@ -1,23 +1,26 @@
 // LZ_KinectDriver.cpp : 定义 DLL 应用程序的导出函数。
 //
-
+#include <memory>
 #include "KinectDriver.h"
 
-
-// 这是导出变量的一个示例
-LZ_EXPORTS_API int nLZ_KinectDriver = 0;
-
-// 这是导出函数的一个示例。
-LZ_EXPORTS_API int fnLZ_KinectDriver(void)
+CKinectDriver::CKinectDriver()
 {
-    return 42;
+	
 }
+
+CKinectDriver::~CKinectDriver()
+{
+
+}
+
+
+std::unique_ptr<CKinectDriver> kinectDriver;
+
 
 // open kinect 
 LZ_EXPORTS_API lzBool lzKinectDriverOpenSensor(void)
 {
-
-
+	kinectDriver = std::unique_ptr<CKinectDriver>(new CKinectDriver());
 
 	return true;
 }
@@ -25,7 +28,7 @@ LZ_EXPORTS_API lzBool lzKinectDriverOpenSensor(void)
 // close kinect
 LZ_EXPORTS_API lzBool lzKinectDriverCloseSensor(void)
 {
-
+	kinectDriver = nullptr;
 	return true;
 }
 
