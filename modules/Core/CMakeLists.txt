@@ -1,15 +1,14 @@
-set(TARGET_NAME lz_KinectDriver)
-set(TARGET_NAME_STATIC lz_KinectDriverStatic)
+set(TARGET_NAME lz_Core)
+set(TARGET_NAME_STATIC lz_CoreStatic)
 set(SRC_DIR src)
 set(INC_DIR inc)
 set(BIN_DIR bin)
 
 if(USE_32BITS)
-set(LIB_DIR_LIST lib/x86 ../Core/lib/x86)
+set(LIB_DIR lib/x86)
 else()
-set(LIB_DIR_LIST lib/x64 ../Core/lib/x64)
+set(LIB_DIR lib/x64)
 endif(USE_32BITS)
-
 
 # 指定代码目录
 aux_source_directory(${SRC_DIR} SRC_LIST)
@@ -20,7 +19,7 @@ include_directories(
 	${INC_DIR}
 	${PROJECT_SOURCE_DIR}/include)
 
-link_directories(${LIB_DIR_LIST})
+link_directories(${LIB_DIR})
 
 # 生成动态库目标
 add_library(${TARGET_NAME} SHARED ${SRC_LIST})
@@ -35,12 +34,9 @@ set_target_properties(${TARGET_NAME_STATIC} PROPERTIES OUTPUT_NAME "${TARGET_NAM
 set_target_properties(${TARGET_NAME} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(${TARGET_NAME_STATIC} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
-# 添加需要引用的静态库
-foreach(mylib ${LIB_DIR_LIST})
-message(${mylib})
-FILE(GLOB_RECURSE LIB_LIST "${mylib}/*.lib")
+FILE(GLOB_RECURSE LIB_LIST "${LIB_DIR}/*.lib")
+
 target_link_libraries(${TARGET_NAME} ${LIB_LIST})
-endforeach()
 
 install(TARGETS ${TARGET_NAME} ${TARGET_NAME_STATIC}
 	RUNTIME DESTINATION bin

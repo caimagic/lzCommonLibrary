@@ -4,6 +4,7 @@ project (lzLib)
 # 版本号
 set (VERSION_MAJOR 1)
 set (VERSION_MINOR 0)
+
 # 配置一个头文件，通过它向源代码中传递一些CMake设置。
 configure_file (
   "${PROJECT_SOURCE_DIR}/Version.h.in"
