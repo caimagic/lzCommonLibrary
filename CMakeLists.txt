@@ -7,7 +7,7 @@ set (VERSION_MINOR 0)
 # 配置一个头文件，通过它向源代码中传递一些CMake设置。
 configure_file (
   "${PROJECT_SOURCE_DIR}/Version.h.in"
-  "${PROJECT_SOURCE_DIR}/Version.h"
+  "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/install)

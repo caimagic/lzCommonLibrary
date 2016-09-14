@@ -5,10 +5,10 @@
 
 
 // 这是导出变量的一个示例
-LZ_KINECTDRIVER_API int nLZ_KinectDriver = 0;
+LZ_EXPORTS_API int nLZ_KinectDriver = 0;
 
 // 这是导出函数的一个示例。
-LZ_KINECTDRIVER_API int fnLZ_KinectDriver(void)
+LZ_EXPORTS_API int fnLZ_KinectDriver(void)
 {
     return 42;
 }
