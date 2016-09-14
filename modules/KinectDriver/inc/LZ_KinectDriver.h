@@ -3,7 +3,7 @@
 
 #include "Version.h"
 #include "lzTypes.h"
-// #include "Kinect.h"
+#include "Kinect.h"
 
 // 下列 ifdef 块是创建使从 DLL 导出更简单的
 // 宏的标准方法。此 DLL 中的所有文件都是用命令行上定义的 LZ_KINECTDRIVER_EXPORTS
@@ -31,15 +31,27 @@ typedef struct
 	lzInt32 colorHeight;
 } Kinect_Driver_Para_Type;
 
+typedef struct
+{
+	lzRGB   frame[KINECT_DRIVER_COLOR_WIDTH * KINECT_DRIVER_COLOR_HEIGHT];
+} Kinect_Driver_Color_Frame_Type;
 
 typedef struct
 {
-	lzInt32 depthFrame[KINECT_DRIVER_DEPTH_WIDTH * KINECT_DRIVER_DEPTH_HEIGHT];
-	lzRGB   colorFrame[KINECT_DRIVER_COLOR_WIDTH * KINECT_DRIVER_COLOR_HEIGHT];
-	lzInt32 bodyIndexFrame[KINECT_DRIVER_DEPTH_WIDTH * KINECT_DRIVER_DEPTH_HEIGHT];
-	
-} Kinect_Driver_Frame_Type;
+	lzInt32 frame[KINECT_DRIVER_DEPTH_WIDTH * KINECT_DRIVER_DEPTH_HEIGHT];
+} Kinect_Driver_Depth_Frame_Type;
 
+typedef struct
+{
+	lzInt32 frame[KINECT_DRIVER_DEPTH_WIDTH * KINECT_DRIVER_DEPTH_HEIGHT];
+} Kinect_Driver_BodyIndex_Frame_Type;
+
+typedef struct
+{
+	Kinect_Driver_Color_Frame_Type color;
+	Kinect_Driver_Depth_Frame_Type depth;
+	Kinect_Driver_BodyIndex_Frame_Type bodyIndex;
+} Kinect_Driver_Frame_Type;
 
 LZ_EXPORTS_API int fnLZ_KinectDriver(void);
 
@@ -51,6 +63,12 @@ LZ_EXPORTS_API bool lzKinectDriverCloseSensor(void);
 
 // 
 LZ_EXPORTS_API bool lzKinectDriverGetParameter(Kinect_Driver_Para_Type* data);
+
+//
+LZ_EXPORTS_API bool lzKInectDriverUpdateFrame();
+
+//
+LZ_EXPORTS_API bool lzKInectDriverAcquireColorFrame();
 
 //
 LZ_EXPORTS_API bool lzKinectDriverAcquireFrame(Kinect_Driver_Frame_Type* data);

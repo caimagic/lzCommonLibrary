@@ -12,6 +12,8 @@ configure_file (
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/install)
   
+option(USE_32BITS "Compile for 64bits processors" ON)
+
 # 添加模块子文件夹  
 add_subdirectory(modules)
 

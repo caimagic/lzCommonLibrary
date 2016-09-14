@@ -1,6 +1,12 @@
 set(SRC_DIR src)
 set(INC_DIR inc)
-set(LIB_DIR lib)
+set(BIN_DIR bin)
+
+if(USE_32BITS)
+set(LIB_DIR lib/x86)
+else()
+set(LIB_DIR lib/x64)
+endif(USE_32BITS)
 
 # 指定代码目录
 aux_source_directory(${SRC_DIR} SRC_LIST)
@@ -26,11 +32,21 @@ set_target_properties(KinectDriverStatic PROPERTIES OUTPUT_NAME "KinectDriver")
 set_target_properties(KinectDriver PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(KinectDriverStatic PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
+FILE(GLOB_RECURSE LIB_LIST "${LIB_DIR}/*.lib")
+FOREACH(src ${LIB_LIST})
+MESSAGE( ${src} )
+ENDFOREACH()
+
+target_link_libraries(KinectDriver ${LIB_LIST})
+
 install(TARGETS KinectDriver KinectDriverStatic
 	RUNTIME DESTINATION bin
-#	LIBRARY DESTINATION lib
+	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 )
 
-file (GLOB INCLUDE_FILE "inc/*.h*")
-install(FILES ${INCLUDE_FILE} DESTINATION include/KinectDriver)
+file (GLOB INCLUDE_FILE_LIST "inc/*.h*")
+install(FILES ${INCLUDE_FILE_LIST} DESTINATION include/KinectDriver)
+
+file (GLOB BIN_LIST "${BIN_DIR}/*.dll*")
+install(FILES ${BIN_LIST} DESTINATION bin)
