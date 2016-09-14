@@ -22,4 +22,4 @@ include_directories("${PROJECT_SOURCE_DIR}")
 # add_library(Tutorial tutorial.cxx)
 # ADD_LIBRARY(Tutorial SHARED tutorial.cxx)
 
-install(FILES "${PROJECT_SOURCE_DIR}/Version.h" DESTINATION include)
+install(FILES "${PROJECT_SOURCE_DIR}/include/Version.h" DESTINATION include)

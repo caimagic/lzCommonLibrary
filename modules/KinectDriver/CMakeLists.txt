@@ -28,7 +28,7 @@ set_target_properties(KinectDriverStatic PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
 install(TARGETS KinectDriver KinectDriverStatic
 	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
+#	LIBRARY DESTINATION lib
 	ARCHIVE DESTINATION lib
 )
 
