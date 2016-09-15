@@ -1,26 +1,22 @@
 set(TARGET_NAME lz_KinectDriver)
 set(TARGET_NAME_STATIC lz_KinectDriverStatic)
 set(SRC_DIR src)
-set(INC_DIR inc)
 set(BIN_DIR bin)
-
-if(USE_32BITS)
-set(LIB_DIR_LIST lib/x86 ../Core/lib/x86)
-else()
-set(LIB_DIR_LIST lib/x64 ../Core/lib/x64)
-endif(USE_32BITS)
-
 
 # 指定代码目录
 aux_source_directory(${SRC_DIR} SRC_LIST)
 # LIST(APPEND SRC_LIST ..)
 
 # 指定头文件目录
-include_directories(
-	${INC_DIR}
-	${PROJECT_SOURCE_DIR}/include
-	../Core/inc)
+set(INC_DIR_LIST inc ${PROJECT_SOURCE_DIR}/include ../../3rdparty/g3log/include)
+include_directories(${INC_DIR_LIST})
 
+# 指定库文件目录
+if(USE_32BITS)
+set(LIB_DIR_LIST lib/x86 ../../3rdparty/g3log/lib/x86)
+else()
+set(LIB_DIR_LIST lib/x64 ../../3rdparty/g3log/lib/x64)
+endif(USE_32BITS)
 link_directories(${LIB_DIR_LIST})
 
 # 生成动态库目标
@@ -48,7 +44,13 @@ install(TARGETS ${TARGET_NAME} ${TARGET_NAME_STATIC}
 	ARCHIVE DESTINATION lib
 )
 
-file (GLOB INCLUDE_FILE_LIST "inc/*.h*")
+# 添加需要引用的静态库
+# foreach(incs ${INC_DIR_LIST})
+# FILE(GLOB_RECURSE INCLUDE_FILE_LIST "${incs}/*.h*")
+# install(FILES ${INCLUDE_FILE_LIST} DESTINATION include/${TARGET_NAME})
+#endforeach()
+
+FILE(GLOB_RECURSE INCLUDE_FILE_LIST "inc/*.h*")
 install(FILES ${INCLUDE_FILE_LIST} DESTINATION include/${TARGET_NAME})
 
 file (GLOB BIN_LIST "${BIN_DIR}/*.dll*")
