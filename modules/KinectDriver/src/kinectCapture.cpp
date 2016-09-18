@@ -44,6 +44,8 @@ KinectCapture::~KinectCapture()
 	SafeRelease(pInfraredFrameReader);
 }
 
+#define  KINECT_CAPTURE_MULTI_FRAME 1
+
 bool KinectCapture::Initialize()
 {
     HRESULT hr;
@@ -52,6 +54,7 @@ bool KinectCapture::Initialize()
 
     if(FAILED(hr))
     {
+		LOGF(INFO, "GetDefaultKinectSensor fail.");
         bInitialized = false;
         return bInitialized;
     }
@@ -169,6 +172,7 @@ bool KinectCapture::Initialize()
         while(!bTemp);
     }
 
+	LOGF(INFO, "KInect Capture succ.");
     return bInitialized;
 }
 
@@ -215,7 +219,6 @@ bool KinectCapture::AcquireFrame()
     }
 
     HRESULT hr = NULL;
-
 	//Multi frame
     IMultiSourceFrame* pMultiFrame = NULL;
     hr = pMultiSourceFrameReader->AcquireLatestFrame(&pMultiFrame);
@@ -224,7 +227,7 @@ bool KinectCapture::AcquireFrame()
     {
         return false;
     }
-	
+
 	GetInfraRedFrame(pMultiFrame);
     GetDepthFrame(pMultiFrame);
     GetColorFrame(pMultiFrame);	
@@ -269,7 +272,7 @@ void KinectCapture::GetDepthFrame(IMultiSourceFrame* pMultiFrame)
             hr = pDepthFrame->get_FrameDescription(&pFrameDescription);
             pFrameDescription->get_Width(&nDepthFrameWidth);
             pFrameDescription->get_Height(&nDepthFrameHeight);
-            pDepth = new UINT16[nDepthFrameHeight * nDepthFrameWidth];
+			pDepth = new UINT16[nDepthFrameHeight * nDepthFrameWidth];
             SafeRelease(pFrameDescription);
         }
 

@@ -78,7 +78,7 @@ typedef struct
 
 typedef struct
 {
-	lzInt32 frame[KINECT_DRIVER_DEPTH_WIDTH * KINECT_DRIVER_DEPTH_HEIGHT];
+	lzUInt8 frame[KINECT_DRIVER_DEPTH_WIDTH * KINECT_DRIVER_DEPTH_HEIGHT];
 } Kinect_Driver_BodyIndex_Frame_Type;
 
 typedef struct
@@ -98,31 +98,33 @@ typedef struct
 	lzPoint2f uv3;
 } Kinect_Driver_Mesh_Type;
 
-
 /********************************************************************************************/
 /*			6 Class Type Definition															*/
 /********************************************************************************************/
-class CKinectDriver
+class LZ_EXPORTS_API CKinectDriver
 {
 public:
 	CKinectDriver();
 	~CKinectDriver();
 
-	lzBool OpenSensor();
-	lzBool UpdateFrame();
+	lzBool OpenSensor(void);
+	lzBool UpdateFrame(void);
 	lzBool SetParameter(IN Kinect_Driver_Para_Type* para);
 	lzBool GetParameter(OUT Kinect_Driver_Para_Type* para);
+	lzInt32 CreateModule(void);
 
 	ICapture* pCapture;
 
 	lzRGBX* pColor;
 	lzInt32* pDepth;
+	lzUInt8* pBodyIndex;
 	lzInt32 colorHeight;
 	lzInt32 colorWidth;
 	lzInt32 depthHeight;
 	lzInt32 depthWidth;
 	Kinect_Driver_Mesh_Model mode;
-
+	std::vector<lzMeshUnitType> vecMeshUnit;
+	
 private:
 
 };
@@ -136,68 +138,70 @@ private:
 /*			8 Function Declare																*/
 /********************************************************************************************/
 
-LZ_EXPORTS_API lzBool lzKinectDriverOpenLog(lzBool isopen = false);
+LZ_EXPORTS_C int lzHello(void);
+
+LZ_EXPORTS_C lzBool lzKinectDriverOpenLog(lzBool isopen = false);
 
 // open kinect 
-LZ_EXPORTS_API lzBool lzKinectDriverOpenSensor(void);
+LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void);
 
 // close kinect
-LZ_EXPORTS_API lzBool lzKinectDriverCloseSensor(void);
+LZ_EXPORTS_C lzBool lzKinectDriverCloseSensor(void);
 
 // 
-LZ_EXPORTS_API lzBool lzKinectDriverSetParameter(IN Kinect_Driver_Para_Type* para);
+LZ_EXPORTS_C lzBool lzKinectDriverSetParameter(IN Kinect_Driver_Para_Type* para);
 
 // 
-LZ_EXPORTS_API lzBool lzKinectDriverGetParameter(OUT Kinect_Driver_Para_Type* para);
+LZ_EXPORTS_C lzBool lzKinectDriverGetParameter(OUT Kinect_Driver_Para_Type* para);
 
 //
-LZ_EXPORTS_API lzBool lzKInectDriverUpdateFrame();
+LZ_EXPORTS_C lzBool lzKInectDriverUpdateFrame();
 
 //
-LZ_EXPORTS_API lzBool lzKInectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame);
+LZ_EXPORTS_C lzBool lzKInectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame);
 
 //
-LZ_EXPORTS_API lzBool lzKInectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame);
+LZ_EXPORTS_C lzBool lzKInectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame);
 
 //
-LZ_EXPORTS_API lzBool lzKInectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame);
+LZ_EXPORTS_C lzBool lzKInectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame);
 
 //
-LZ_EXPORTS_API lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* frame);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* frame);
 
 // 
-LZ_EXPORTS_API lzBool lzKinectDriverMapDepthFrameToCameraSpace(
+LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToCameraSpace(
 	IN lzInt32 depthPointCount,
 	IN Kinect_Driver_Depth_Frame_Type* depthFrame,
 	IN lzInt32 cameraPointCount,
 	OUT CameraSpacePoint* cameraSpacePoints);
 
 // 
-LZ_EXPORTS_API lzBool lzKinectDriverMapDepthFrameToColorSpace(
+LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToColorSpace(
 	IN lzInt32 depthPointCount,
 	IN Kinect_Driver_Depth_Frame_Type* depthFrame,
 	IN lzInt32 colorPointCount,
 	OUT ColorSpacePoint* colorSpacePoints);
 
 // 
-LZ_EXPORTS_API lzBool lzKinectDriverMapColorFrameToCameraSpace(
+LZ_EXPORTS_C lzBool lzKinectDriverMapColorFrameToCameraSpace(
 	IN lzInt32 colorPointCount,
 	IN Kinect_Driver_Color_Frame_Type* colorFrame,
 	IN lzInt32 cameraPointCount,
 	OUT CameraSpacePoint* cameraSpacePoints);
 
 // 
-LZ_EXPORTS_API lzBool lzKinectDriverMapColorFrameToDepthSpace(
+LZ_EXPORTS_C lzBool lzKinectDriverMapColorFrameToDepthSpace(
 	IN lzInt32 colorPointCount,
 	IN Kinect_Driver_Color_Frame_Type* colorFrame,
 	IN lzInt32 depthPointCount,
 	OUT DepthSpacePoint* depthSpacePoints);
 
 //
-LZ_EXPORTS_API lzBool lzKinectDriverAcquireMeshCount(OUT lzInt32* count);
+LZ_EXPORTS_C lzInt32 lzKinectDriverAcquireMeshCount(OUT lzInt32* count);
 
 //
-LZ_EXPORTS_API lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh);
 
 
 #endif // __LZ_KINECT_DRIVER_H__ 

@@ -65,7 +65,7 @@ struct Body
 	std::vector<lzPoint2f> vJointsInColorSpace;
 };
 
-class ICapture
+class LZ_EXPORTS_API ICapture
 {
 public:
 	ICapture();

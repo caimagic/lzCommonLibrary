@@ -67,12 +67,16 @@
 // 任何其他项目上不应定义此符号。这样，源文件中包含此文件的任何其他项目都会将
 // LZ_KINECTDRIVER_API 函数视为是从 DLL 导入的，而此 DLL 则将用此宏定义的
 // 符号视为是被导出的。
+#define LZ_EXPORTS
 
 #ifdef LZ_EXPORTS
-#define LZ_EXPORTS_API extern "C" __declspec(dllexport)
+#define LZ_EXPORTS_API __declspec(dllexport)
+#define LZ_EXPORTS_C extern "C" LZ_EXPORTS_API
 #else
-#define LZ_EXPORTS_API extern "C" __declspec(dllimport)
+#define LZ_EXPORTS_API __declspec(dllimport)
+#define LZ_EXPORTS_C extern "C" LZ_EXPORTS_API
 #endif
+
 
 /********************************************************************************************/
 /*			3 Enum Type Definition															*/
@@ -123,10 +127,10 @@ typedef struct
 
 typedef struct
 {
-	lzFloat32 r;
-	lzFloat32 g;
-	lzFloat32 b;
-	lzFloat32 x;
+	lzUInt8 r;
+	lzUInt8 g;
+	lzUInt8 b;
+	lzUInt8 x;
 } lzRGBX;
 
 typedef struct 
@@ -135,6 +139,16 @@ typedef struct
 	lzUInt16 height;
 } lzImgSize;
 
+typedef struct
+{
+	lzPoint3f p0;
+	lzPoint3f p1;
+	lzPoint3f p2;
+
+	lzPoint2f uv0;
+	lzPoint2f uv1;
+	lzPoint2f uv2;
+} lzMeshUnitType;
 
 /********************************************************************************************/
 /*			6 Class Type Definition															*/

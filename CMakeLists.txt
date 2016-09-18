@@ -26,6 +26,7 @@ include_directories("${PROJECT_SOURCE_DIR}")
 # ADD_LIBRARY(Tutorial SHARED tutorial.cxx)
 
 install(FILES "${PROJECT_SOURCE_DIR}/include/Version.h" DESTINATION include)
+install(FILES "${PROJECT_SOURCE_DIR}/include/lzTypes.h" DESTINATION include)
 
 FILE(GLOB_RECURSE G3LOG_FILE_LIST "${PROJECT_SOURCE_DIR}/3rdparty/g3log/include/g3log/*.h*")
 install(FILES ${G3LOG_FILE_LIST} DESTINATION include/g3log)
