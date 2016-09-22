@@ -5,15 +5,51 @@ project (lzLib)
 set (VERSION_MAJOR 1)
 set (VERSION_MINOR 0)
 
+# 确定平台环境和编译位数
+if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	if (${CMAKE_SIZEOF_VOID_P} MATCHES "8")
+		set (SetPlatform Linux64)
+	else()
+		set (SetPlatform Linux32)
+	endif()
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	if (${CMAKE_SIZEOF_VOID_P} MATCHES "8")
+		set (SetPlatform Windows64)
+	else()
+		set (SetPlatform Windows32)
+	endif()
+endif()
+
 # 配置一个头文件，通过它向源代码中传递一些CMake设置。
+if (${SetPlatform} MATCHES "Linux64")
 configure_file (
-  "${PROJECT_SOURCE_DIR}/Version.h.in"
+  "${PROJECT_SOURCE_DIR}/VersionLinux64.h.in"
   "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
+elseif (${SetPlatform} MATCHES "Linux32")
+configure_file (
+  "${PROJECT_SOURCE_DIR}/VersionLinux32.h.in"
+  "${PROJECT_SOURCE_DIR}/include/Version.h"
+  )
+elseif (${SetPlatform} MATCHES "Windows64")
+configure_file (
+  "${PROJECT_SOURCE_DIR}/VersionWindows64.h.in"
+  "${PROJECT_SOURCE_DIR}/include/Version.h"
+  )
+elseif (${SetPlatform} MATCHES "Windows32")
+configure_file (
+  "${PROJECT_SOURCE_DIR}/VersionWindows32.h.in"
+  "${PROJECT_SOURCE_DIR}/include/Version.h"
+  )
+else()
+configure_file (
+  "${PROJECT_SOURCE_DIR}/VersionWindows32.h.in"
+  "${PROJECT_SOURCE_DIR}/include/Version.h"
+  )
+endif()
 
+# 设定安装目录
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/install)
-  
-option(USE_32BITS "Compile for 64bits processors" ON)
 
 # 添加模块子文件夹  
 add_subdirectory(modules)

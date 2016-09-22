@@ -12,11 +12,19 @@ set(INC_DIR_LIST inc ${PROJECT_SOURCE_DIR}/include ../../3rdparty/g3log/include)
 include_directories(${INC_DIR_LIST})
 
 # 指定库文件目录
-if(USE_32BITS)
-set(LIB_DIR_LIST lib/x86 ../../3rdparty/g3log/lib/x86)
+
+if (${SetPlatform} MATCHES "Linux64")
+	MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
+elseif (${SetPlatform} MATCHES "Linux32")
+	MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
+elseif (${SetPlatform} MATCHES "Windows64")
+	set(LIB_DIR_LIST lib/x64 ../../3rdparty/g3log/lib/x64)
+elseif (${SetPlatform} MATCHES "Windows32")
+	set(LIB_DIR_LIST lib/x86 ../../3rdparty/g3log/lib/x86)
 else()
-set(LIB_DIR_LIST lib/x64 ../../3rdparty/g3log/lib/x64)
-endif(USE_32BITS)
+	set(LIB_DIR_LIST lib/x86 ../../3rdparty/g3log/lib/x86)
+endif()
+
 link_directories(${LIB_DIR_LIST})
 
 # 生成动态库目标

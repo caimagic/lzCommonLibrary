@@ -26,6 +26,7 @@
 #include "lzTypes.h"
 #include "Kinect.h"
 #include "ICapture.h"
+#include "MMAPFile.h"
 
 /********************************************************************************************/
 /*			2 Macro Definition																*/
@@ -96,6 +97,7 @@ typedef struct
 	lzPoint2f uv1;
 	lzPoint2f uv2;
 	lzPoint2f uv3;
+	lzUInt32 index;
 } Kinect_Driver_Mesh_Type;
 
 /********************************************************************************************/
@@ -203,5 +205,10 @@ LZ_EXPORTS_C lzInt32 lzKinectDriverAcquireMeshCount(OUT lzInt32* count);
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh);
 
+//
+LZ_EXPORTS_C lzInt32 lzKinectDriverReadMMAPFileCount(lzUInt32 framecount);
+
+//
+LZ_EXPORTS_C lzBool lzKinectDriverReadMMAP(Kinect_Driver_Mesh_Type mesh[], lzInt32 count);
 
 #endif // __LZ_KINECT_DRIVER_H__ 

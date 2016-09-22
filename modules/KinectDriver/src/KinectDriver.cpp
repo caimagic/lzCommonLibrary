@@ -447,12 +447,54 @@ LZ_EXPORTS_C lzInt32 lzKinectDriverAcquireMeshCount(OUT lzInt32* count)
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh)
 {
-
-
-
-
-
-
 	return true;
 }
 
+//
+char* ptr = NULL;
+lzInt32 meshCount = 0;
+lzInt32 filecount = 0;
+
+LZ_EXPORTS_C lzInt32 lzKinectDriverReadMMAPFileCount(lzUInt32 framecount)
+{
+	CMMAPFile* mmapFile = new CMMAPFile();
+	char temp[100];
+	sprintf_s(temp, "D:\\file\\%d.bin", framecount);
+	string filename(temp);
+
+	unsigned long size_low = 0;
+	unsigned long size_high = 0;
+	size_low = mmapFile->MMAP_GetFileSize(filename, &size_high);
+	char* pvFile = (char*)mmapFile->MMAP_CreateFile(filename, CMMAPFILE_OPEN_EXISTING, 0, size_low, size_high);
+	if (NULL == pvFile)
+	{
+		LOGF(WARNING, "open file fail %s", filename.c_str());
+		return 0;
+	}
+
+	ptr = pvFile;
+
+	meshCount = *(int*)ptr;
+	ptr += sizeof(int);
+
+	return meshCount;
+}
+
+//
+LZ_EXPORTS_C lzBool lzKinectDriverReadMMAP(Kinect_Driver_Mesh_Type mesh[], lzInt32 count)
+{
+	if ((count == 0) || (meshCount == 0))
+	{
+		return false;
+	}
+	
+	lzInt32 c = meshCount < count ? meshCount : count;
+
+	for (int i = 0; i < c; i++)
+	{
+		memcpy(&mesh[i], ptr, sizeof(Kinect_Driver_Mesh_Type));
+		ptr += sizeof(Kinect_Driver_Mesh_Type);
+	}
+
+	return true;
+}

@@ -1,0 +1,9 @@
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+
+// #define _CPU_LINUX_32_
+// #define _CPU_LINUX_64_
+// #define _CPU_WIN_32_
+#define _CPU_WIN_64_
+
+#define LZ_EXPORTS
