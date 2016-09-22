@@ -44,8 +44,6 @@ KinectCapture::~KinectCapture()
 	SafeRelease(pInfraredFrameReader);
 }
 
-#define  KINECT_CAPTURE_MULTI_FRAME 1
-
 bool KinectCapture::Initialize()
 {
     HRESULT hr;
@@ -71,7 +69,6 @@ bool KinectCapture::Initialize()
         hr = pKinectSensor->Open();
         if(SUCCEEDED(hr))
         {
-#if KINECT_CAPTURE_MULTI_FRAME
             pKinectSensor->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_Color |
                     FrameSourceTypes::FrameSourceTypes_Depth |
                     FrameSourceTypes::FrameSourceTypes_Body |
@@ -79,68 +76,6 @@ bool KinectCapture::Initialize()
 					FrameSourceTypes::FrameSourceTypes_Infrared | 
 					FrameSourceTypes::FrameSourceTypes_LongExposureInfrared,
                     &pMultiSourceFrameReader);
-#else
-			hr = pKinectSensor->get_DepthFrameSource(&pDepthFrameSource);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor get_DepthFrameSource fail.");
-			}
-
-			hr = pDepthFrameSource->OpenReader(&pDepthFrameReader);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor DepthFrameSource OpenReader fail.");
-			}
-
-            hr = pKinectSensor->get_ColorFrameSource(&pColorFrameSource);
-            if(!SUCCEEDED(hr))
-            {
-				LOGF(WARNING, "KinectSensor get_ColorFrameSource fail");
-            }
-
-            hr = pColorFrameSource->OpenReader(&pColorFrameReader);
-            if(!SUCCEEDED(hr))
-            {
-				LOGF(WARNING, "KinectSensor ColorFrameSource OpenReader fail.");
-            }
-
-			hr = pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor get_BodyFrameSource fail.");
-			}
-
-			hr = pBodyFrameSource->OpenReader(&pBodyFrameReader);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor BodyFrameSource OpenReader fail.");
-			}
-
-			hr = pKinectSensor->get_BodyIndexFrameSource(&pBodyIndexFrameSource);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor get_BodyIndexFrameSource fail.");
-			}
-
-			hr = pBodyIndexFrameSource->OpenReader(&pBodyIndexFrameReader);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor BodyIndexFrameSource OpenReader fail.");
-			}
-
-			hr = pKinectSensor->get_InfraredFrameSource(&pInfraredFrameSource);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor get_InfraredFrameSource fail.");
-			}
-
-			hr = pInfraredFrameSource->OpenReader(&pInfraredFrameReader);
-			if (!SUCCEEDED(hr))
-			{
-				LOGF(WARNING, "KinectSensor InfraredFrameSource OpenReader fail.");
-			}           
-
-#endif
         }
         else
         {

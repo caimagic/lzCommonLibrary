@@ -52,7 +52,8 @@ endif()
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/install)
 
 # 添加模块子文件夹  
-add_subdirectory(modules)
+add_subdirectory(modules) 
+add_subdirectory(sample)
 
 # 将二进制文件树添加到包含文件的搜索路径中，这样我们可以找到TutorialConfig.h
 include_directories("${PROJECT_SOURCE_DIR}")

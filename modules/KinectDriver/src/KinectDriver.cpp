@@ -216,7 +216,7 @@ lzInt32 CKinectDriver::CreateModule(void)
 
 	delete[] pCameraSpacePoint;
 	delete[] pColorSpacePoint;
-	return false;
+	return vecMeshUnit.size();
 }
 
 LZ_EXPORTS_C int lzHello(void)
@@ -252,8 +252,6 @@ LZ_EXPORTS_C lzBool lzKinectDriverOpenLog(lzBool isopen)
 	return true;
 }
 
-#define KINECT_CAPTURE_MULTI_FRAME 1
-
 // open kinect 
 LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void)
 {
@@ -287,7 +285,7 @@ LZ_EXPORTS_C lzBool lzKinectDriverGetParameter(OUT Kinect_Driver_Para_Type* para
 }
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverUpdateFrame()
+LZ_EXPORTS_C lzBool lzKinectDriverUpdateFrame()
 {
 	lzBool ret = true;
 	ret = kinectDriver->UpdateFrame();
@@ -295,7 +293,7 @@ LZ_EXPORTS_C lzBool lzKInectDriverUpdateFrame()
 }
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame)
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame)
 {
 	if ((kinectDriver->colorHeight != KINECT_DRIVER_COLOR_HEIGHT) 
 		|| (kinectDriver->colorWidth != KINECT_DRIVER_COLOR_WIDTH))
@@ -326,7 +324,7 @@ LZ_EXPORTS_C lzBool lzKInectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Fram
 }
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame)
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame)
 {
 	if ((kinectDriver->depthHeight != KINECT_DRIVER_DEPTH_HEIGHT)
 		|| (kinectDriver->depthWidth != KINECT_DRIVER_DEPTH_WIDTH))
@@ -351,7 +349,7 @@ LZ_EXPORTS_C lzBool lzKInectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Fram
 }
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame)
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame)
 {
 	if ((kinectDriver->depthHeight != KINECT_DRIVER_DEPTH_HEIGHT)
 		|| (kinectDriver->depthWidth != KINECT_DRIVER_DEPTH_WIDTH))
@@ -386,9 +384,9 @@ LZ_EXPORTS_C lzBool lzKInectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIn
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* frame)
 {
-	lzKInectDriverAcquireColorFrame(&frame->color);
-	lzKInectDriverAcquireDepthFrame(&frame->depth);
-	lzKInectDriverAcquireBodyIndexFrame(&frame->bodyIndex);
+	lzKinectDriverAcquireColorFrame(&frame->color);
+	lzKinectDriverAcquireDepthFrame(&frame->depth);
+	lzKinectDriverAcquireBodyIndexFrame(&frame->bodyIndex);
 	return true;
 }
 
@@ -437,16 +435,25 @@ LZ_EXPORTS_C lzBool lzKinectDriverMapColorFrameToDepthSpace(
 }
 
 //
-LZ_EXPORTS_C lzInt32 lzKinectDriverAcquireMeshCount(OUT lzInt32* count)
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireMeshCount(OUT lzInt32* count)
 {
 	lzInt32 meshCount = 0;
 	meshCount = kinectDriver->CreateModule();
-	return meshCount;
+	*count = meshCount;
+
+	if (meshCount == 0)
+	{
+		return false;
+	}
+	return true;
 }
 
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh)
 {
+
+
+
 	return true;
 }
 

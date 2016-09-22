@@ -200,7 +200,7 @@ LZ_EXPORTS_C lzBool lzKinectDriverMapColorFrameToDepthSpace(
 	OUT DepthSpacePoint* depthSpacePoints);
 
 //
-LZ_EXPORTS_C lzInt32 lzKinectDriverAcquireMeshCount(OUT lzInt32* count);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireMeshCount(OUT lzInt32* count);
 
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh);
