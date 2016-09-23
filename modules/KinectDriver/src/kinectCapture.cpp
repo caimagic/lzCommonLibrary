@@ -163,6 +163,7 @@ bool KinectCapture::AcquireFrame()
         return false;
     }
 
+	LOGF(INFO, "kinect capture acquire frame succ");
 	GetInfraRedFrame(pMultiFrame);
     GetDepthFrame(pMultiFrame);
     GetColorFrame(pMultiFrame);	

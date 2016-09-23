@@ -252,6 +252,22 @@ LZ_EXPORTS_C lzBool lzKinectDriverOpenLog(lzBool isopen)
 	return true;
 }
 
+
+LZ_EXPORTS_C lzBool lzKinectDriverCloseLog()
+{
+	if ((worker == nullptr)&&(handle == nullptr))
+	{
+		return false;
+	}
+
+	g3::only_change_at_initialization::setLogLevel(WARNING, false);
+	g3::only_change_at_initialization::setLogLevel(INFO, false);
+	g3::only_change_at_initialization::setLogLevel(DEBUG, false);
+	worker = nullptr;
+	handle = nullptr;
+	return true;
+}
+
 // open kinect 
 LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void)
 {
@@ -261,7 +277,25 @@ LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void)
 	return true;
 }
 
-// close kinect
+/** \brief lzKinectDriverCloseSensor
+*
+*	\code {.cpp}
+	kinectDriver = nullptr;
+	worker = nullptr;
+	handle = nullptr;
+	return true;
+*	\endcode
+*
+* 	\fn    
+*	\note  
+*   \author	caimagic
+*   \date   2016/9/23 20:49:10
+*	\param[in] null
+*	\param[out]  null
+*	\warning  fuck£¡£¡£¡
+*	\return	
+*	\sa 
+*/
 LZ_EXPORTS_C lzBool lzKinectDriverCloseSensor(void)
 {
 	kinectDriver = nullptr;

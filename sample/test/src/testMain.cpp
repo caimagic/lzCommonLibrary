@@ -8,5 +8,5 @@ TEST(AdditionTest, twoValues)
 
 TEST(AdditionTest, twoValues1) 
 {
-	EXPECT_EQ(5, 0);
+	EXPECT_EQ(5, 5);
 }

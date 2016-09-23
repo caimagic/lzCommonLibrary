@@ -142,7 +142,11 @@ private:
 
 LZ_EXPORTS_C int lzHello(void);
 
+//
 LZ_EXPORTS_C lzBool lzKinectDriverOpenLog(lzBool isopen = false);
+
+//
+LZ_EXPORTS_C lzBool lzKinectDriverCloseLog();
 
 // open kinect 
 LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void);

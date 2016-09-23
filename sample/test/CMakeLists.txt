@@ -7,11 +7,11 @@ aux_source_directory(${SRC_DIR} SRC_LIST)
 # LIST(APPEND SRC_LIST ..)
 
 # 指定头文件目录
-set(INC_DIR_LIST inc ${PROJECT_SOURCE_DIR}/modules/GTest/include ${PROJECT_SOURCE_DIR}/modules/GTest ${PROJECT_BINARY_DIR}/install)
+set(INC_DIR_LIST inc ${PROJECT_SOURCE_DIR}/modules/GTest/include ${PROJECT_SOURCE_DIR}/modules/GTest ${PROJECT_BINARY_DIR}/install/include)
+
 include_directories(${INC_DIR_LIST})
 
 # 指定库文件目录
-
 if (${SetPlatform} MATCHES "Linux64")
 	#MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
 	#link_directories(${LIB_DIR_LIST})
@@ -19,13 +19,13 @@ elseif (${SetPlatform} MATCHES "Linux32")
 	#MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
 	#link_directories(${LIB_DIR_LIST})
 elseif (${SetPlatform} MATCHES "Windows64")
-	set(LIB_DIR_LIST ${PROJECT_BINARY_DIR}/install/lib)
+	set(LIB_DIR_LIST ${PROJECT_BINARY_DIR}/install/lib ${PROJECT_BINARY_DIR}/install/bin)
 	link_directories(${LIB_DIR_LIST})
 elseif (${SetPlatform} MATCHES "Windows32")
-	set(LIB_DIR_LIST ${PROJECT_BINARY_DIR}/install/lib)
+	set(LIB_DIR_LIST ${PROJECT_BINARY_DIR}/install/lib ${PROJECT_BINARY_DIR}/install/bin)
 	link_directories(${LIB_DIR_LIST})
 else()
-	set(LIB_DIR_LIST ${PROJECT_BINARY_DIR}/install/lib)
+	set(LIB_DIR_LIST ${PROJECT_BINARY_DIR}/install/lib ${PROJECT_BINARY_DIR}/install/bin)
 	link_directories(${LIB_DIR_LIST})
 endif()
 
@@ -40,7 +40,8 @@ target_link_libraries(${TARGET_NAME} libgtest)
 
 # 添加需要引用的静态库
 foreach(libs ${LIB_DIR_LIST})
-FILE(GLOB_RECURSE LIB_LIST "${libs}/*.lib")
+FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+message(STATUS "my lib ${LIB_LIST}")
 target_link_libraries(${TARGET_NAME} ${LIB_LIST})
 endforeach()
 
