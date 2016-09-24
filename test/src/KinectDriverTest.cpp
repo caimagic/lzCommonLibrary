@@ -1,6 +1,6 @@
 #include "stdio.h"
 #include "gtest/gtest.h"
-#include "lz_KinectDriver/KinectDriver.h"
+#include "KinectDriver.h"
 #include "thread"
 
 TEST(KinectDriver, lzHello)

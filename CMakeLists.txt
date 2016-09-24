@@ -53,7 +53,7 @@ set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR}/install)
 
 # 添加模块子文件夹  
 add_subdirectory(modules) 
-add_subdirectory(sample)
+add_subdirectory(test)
 
 # 将二进制文件树添加到包含文件的搜索路径中，这样我们可以找到TutorialConfig.h
 include_directories("${PROJECT_SOURCE_DIR}")
@@ -67,3 +67,15 @@ install(FILES "${PROJECT_SOURCE_DIR}/include/lzTypes.h" DESTINATION include)
 
 FILE(GLOB_RECURSE G3LOG_FILE_LIST "${PROJECT_SOURCE_DIR}/3rdparty/g3log/include/g3log/*.h*")
 install(FILES ${G3LOG_FILE_LIST} DESTINATION include/g3log)
+
+# 宏 遍历文件夹
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
