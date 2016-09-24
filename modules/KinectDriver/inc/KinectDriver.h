@@ -140,7 +140,7 @@ private:
 /*			8 Function Declare																*/
 /********************************************************************************************/
 
-LZ_EXPORTS_C int lzHello(void);
+LZ_EXPORTS_C lzInt32 lzTest(lzInt32 val);
 
 //
 LZ_EXPORTS_C lzBool lzKinectDriverOpenLog(lzBool isopen = false);

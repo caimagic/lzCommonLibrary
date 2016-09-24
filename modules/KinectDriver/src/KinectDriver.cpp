@@ -219,9 +219,9 @@ lzInt32 CKinectDriver::CreateModule(void)
 	return vecMeshUnit.size();
 }
 
-LZ_EXPORTS_C int lzHello(void)
+LZ_EXPORTS_C lzInt32 lzTest(lzInt32 val)
 {
-	return 500;
+	return val;
 }
 
 LZ_EXPORTS_C lzBool lzKinectDriverOpenLog(lzBool isopen)
@@ -267,6 +267,7 @@ LZ_EXPORTS_C lzBool lzKinectDriverCloseLog()
 	handle = nullptr;
 	return true;
 }
+
 
 // open kinect 
 LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void)
@@ -431,6 +432,9 @@ LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToCameraSpace(
 	IN lzInt32 cameraPointCount,
 	OUT CameraSpacePoint* cameraSpacePoints)
 {
+
+
+
 
 	return true;
 }

@@ -3,11 +3,23 @@
 #include "KinectDriver.h"
 #include "thread"
 
-TEST(KinectDriver, lzHello)
+TEST(KinectDriver, lzTest)
 {
-	lzInt32 ret = lzHello();
+	lzInt32 val = 1000;
+	lzInt32 ret = lzTest(val);
 
-	EXPECT_EQ(ret, 500);
+#if (_CPU_CONFIG_ == _CPU_LINUX_32_)
+	cout << "_CPU_CONFIG_ _CPU_LINUX_32_" << endl;
+#elif (_CPU_CONFIG_ == _CPU_LINUX_64_)
+	cout << "_CPU_CONFIG_ _CPU_LINUX_64_" << endl;
+#elif (_CPU_CONFIG_ == _CPU_WIN_32_)
+	cout << "_CPU_CONFIG_ _CPU_WIN_32_" << endl;
+#elif (_CPU_CONFIG_ == _CPU_WIN_64_)
+	cout << "_CPU_CONFIG_ _CPU_WIN_64_" << endl;
+#elif
+	cout << "_CPU_CONFIG_ undefined" << endl;
+#endif
+	EXPECT_EQ(ret, val);
 }
 
 
@@ -18,10 +30,22 @@ void myFirstThread()
 
 TEST(KinectDriver, capture)
 {
+	lzBool ret = false;
+
 	lzKinectDriverOpenLog(true);
-	lzKinectDriverCloseLog();
+	
+	ret = lzKinectDriverOpenSensor();
+	if (ret == false)
+	{
+		std::cout << " open sensor fail" << std::endl;
+	}
+
+
+
 
 	thread myThread(myFirstThread);
 	myThread.join();
+
+	lzKinectDriverCloseLog();
 	EXPECT_EQ(0, 0);
 }
