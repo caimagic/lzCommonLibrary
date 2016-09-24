@@ -3,29 +3,33 @@ set(TARGET_NAME_STATIC lz_KinectDriverStatic)
 set(SRC_DIR src)
 set(BIN_DIR bin)
 
-# 指定代码目录
+# 指定源代码
 aux_source_directory(${SRC_DIR} SRC_LIST)
-# LIST(APPEND SRC_LIST ..)
+SUBDIRLIST(SUBDIRS src)
+FOREACH(subdir ${SUBDIRS})
+  FILE(GLOB_RECURSE SRC_FILE_LIST "src/${subdir}/*.c*")
+  LIST(APPEND SRC_LIST ${SRC_FILE_LIST})
+ENDFOREACH()
+
 
 # 指定头文件目录
-set(INC_DIR_LIST inc ${PROJECT_SOURCE_DIR}/include ../../3rdparty/g3log/include)
+set(INC_DIR_LIST inc ${PROJECT_SOURCE_DIR}/include)
+
+# modules文件夹下头文件
+SUBDIRLIST(SUBDIRS inc)
+FOREACH(subdir ${SUBDIRS})
+  #ADD_SUBDIRECTORY(${subdir})
+  LIST(APPEND INC_DIR_LIST inc/${subdir})
+ENDFOREACH()
 include_directories(${INC_DIR_LIST})
 
-# 指定库文件目录
-
-if (${SetPlatform} MATCHES "Linux64")
-	MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
-elseif (${SetPlatform} MATCHES "Linux32")
-	MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
-elseif (${SetPlatform} MATCHES "Windows64")
-	set(LIB_DIR_LIST lib/x64 ../../3rdparty/g3log/lib/x64)
-elseif (${SetPlatform} MATCHES "Windows32")
-	set(LIB_DIR_LIST lib/x86 ../../3rdparty/g3log/lib/x86)
-else()
-	set(LIB_DIR_LIST lib/x86 ../../3rdparty/g3log/lib/x86)
-endif()
-
-link_directories(${LIB_DIR_LIST})
+# 3rdparty文件夹下头文件
+SUBDIRLIST(SUBDIRS ${PROJECT_SOURCE_DIR}/3rdparty)
+FOREACH(subdir ${SUBDIRS})
+  #ADD_SUBDIRECTORY(${subdir})
+  LIST(APPEND INC_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/${subdir}/include)
+ENDFOREACH()
+include_directories(${INC_DIR_LIST})
 
 # 生成动态库目标
 add_library(${TARGET_NAME} SHARED ${SRC_LIST})
@@ -40,11 +44,107 @@ add_library(${TARGET_NAME_STATIC} STATIC ${SRC_LIST})
 set_target_properties(${TARGET_NAME} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 set_target_properties(${TARGET_NAME_STATIC} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
-# 添加需要引用的静态库
-foreach(libs ${LIB_DIR_LIST})
-FILE(GLOB_RECURSE LIB_LIST "${libs}/*.lib")
-target_link_libraries(${TARGET_NAME} ${LIB_LIST})
-endforeach()
+# 添加编译库
+# FILE(GLOB_RECURSE LIB_FILE_LIST "GTest/src/*.c*")
+# add_library(libgtest ${LIB_FILE_LIST})
+# target_link_libraries(${TARGET_NAME} libgtest) 
+
+# 添加静态库文件和目录
+if (${SetPlatform} MATCHES "Linux64")
+	##
+elseif (${SetPlatform} MATCHES "Linux32")
+	##
+elseif (${SetPlatform} MATCHES "Windows64")
+	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/g3log/lib/x64)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/kinect20/lib/x64)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+	
+elseif (${SetPlatform} MATCHES "Windows32")
+	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/g3log/lib/x86)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/kinect20/lib/x86)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+	
+else()
+	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/g3log/lib/x86)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/kinect20/lib/x86)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+endif()
+
+## none
+SUBDIRLIST(SUBDIRS ${PROJECT_SOURCE_DIR}/3rdparty)
+FOREACH(subdir ${SUBDIRS})
+# 指定库文件目录
+if (${SetPlatform} MATCHES "Linux64")
+	#MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
+	#link_directories(${LIB_DIR_LIST})
+elseif (${SetPlatform} MATCHES "Linux32")
+	#MESSAGE(STATUS "platform: ${SetPlatform}, no link") 
+	#link_directories(${LIB_DIR_LIST})
+elseif (${SetPlatform} MATCHES "Windows64")
+	#set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/${subdir}/lib/x64)
+	#link_directories(${LIB_DIR_LIST})
+	#foreach(libs ${LIB_DIR_LIST})
+	#	FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+	#	message(STATUS "lib ${LIB_LIST}")
+	#	target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	#endforeach()
+elseif (${SetPlatform} MATCHES "Windows32")
+	#set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/${subdir}/lib/x86)
+	#link_directories(${LIB_DIR_LIST})
+	#foreach(libs ${LIB_DIR_LIST})
+	#	FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+	#	message(STATUS "lib ${LIB_LIST}")
+	#	target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	#endforeach()
+else()
+	#set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/${subdir}/lib/x86)
+	#link_directories(${LIB_DIR_LIST})
+	#foreach(libs ${LIB_DIR_LIST})
+	#	FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+	#	message(STATUS "lib ${LIB_LIST}")
+	#	target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	#endforeach()
+endif()
+ENDFOREACH()
 
 install(TARGETS ${TARGET_NAME} ${TARGET_NAME_STATIC}
 	RUNTIME DESTINATION bin
@@ -53,10 +153,10 @@ install(TARGETS ${TARGET_NAME} ${TARGET_NAME_STATIC}
 )
 
 # 添加需要引用的静态库
-# foreach(incs ${INC_DIR_LIST})
+#foreach(incs ${INC_DIR_LIST})
 #	FILE(GLOB_RECURSE INCLUDE_FILE_LIST "${incs}/*.h*")
 #	install(FILES ${INCLUDE_FILE_LIST} DESTINATION include/${TARGET_NAME})
-# endforeach()
+#endforeach()
 
 FILE(GLOB_RECURSE INCLUDE_FILE_LIST "inc/*.h*")
 install(FILES ${INCLUDE_FILE_LIST} DESTINATION include/${TARGET_NAME})
