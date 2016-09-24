@@ -161,19 +161,22 @@ LZ_EXPORTS_C lzBool lzKinectDriverSetParameter(IN Kinect_Driver_Para_Type* para)
 LZ_EXPORTS_C lzBool lzKinectDriverGetParameter(OUT Kinect_Driver_Para_Type* para);
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverUpdateFrame();
+LZ_EXPORTS_C lzBool lzKinectDriverUpdateFrame();
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame);
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame);
 
 //
-LZ_EXPORTS_C lzBool lzKInectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame);
 
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* frame);
+
+//
+LZ_EXPORTS_C lzBool lzKinectDriverSaveRawData(IN string filename);
 
 // 
 LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToCameraSpace(

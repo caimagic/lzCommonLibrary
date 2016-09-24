@@ -63,7 +63,6 @@ lzBool CKinectDriver::OpenSensor()
 		depthHeight = pCapture->nDepthFrameHeight;
 		depthWidth = pCapture->nDepthFrameWidth;
 	}
-
 	return ret;
 }
 
@@ -272,10 +271,12 @@ LZ_EXPORTS_C lzBool lzKinectDriverCloseLog()
 // open kinect 
 LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void)
 {
-	kinectDriver = std::unique_ptr<CKinectDriver>(new CKinectDriver());
-	kinectDriver->OpenSensor();
+	lzBool ret = false;
 
-	return true;
+	kinectDriver = std::unique_ptr<CKinectDriver>(new CKinectDriver());
+	ret = kinectDriver->OpenSensor();
+
+	return ret;
 }
 
 /** \brief lzKinectDriverCloseSensor
@@ -425,6 +426,47 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* fra
 	return true;
 }
 
+//
+LZ_EXPORTS_C lzBool lzKinectDriverSaveRawData(IN string filename)
+{
+	CMMAPFile* pMMAPFile = new CMMAPFile();
+	unsigned long size_low = kinectDriver->colorHeight*kinectDriver->colorWidth * sizeof(lzRGBX);
+	size_low += kinectDriver->depthHeight*kinectDriver->depthWidth * sizeof(lzInt32);
+	unsigned long size_high = 0;
+
+	char* pvFile = (char*)pMMAPFile->MMAP_CreateFile(filename, CMMAPFILE_CREATE_ALWAYS, 0, size_low, size_high);
+	if (NULL == pvFile)
+	{
+		LOGF(WARNING, "open file fail %s", filename.c_str());
+		return false;
+	}
+
+	lzRGBX* ptrColor = (lzRGBX*)pvFile;
+	for (int i = 0; i < kinectDriver->colorHeight; i++)
+	{
+		for (int j = 0; j < kinectDriver->colorWidth; j++)
+		{
+			*ptrColor = kinectDriver->pColor[i*kinectDriver->colorWidth + j];
+			ptrColor++;
+		}
+	}
+
+	lzInt32* ptrDepth = (lzInt32*)(pvFile + kinectDriver->colorHeight*kinectDriver->colorWidth * sizeof(lzRGBX));
+	for (int i = 0; i < kinectDriver->depthHeight; i++)
+	{
+		for (int j = 0; j < kinectDriver->depthWidth; j++)
+		{
+			*ptrDepth = kinectDriver->pDepth[i*kinectDriver->depthWidth + j];
+			ptrDepth++;
+		}
+	}
+	pMMAPFile->MMAP_Release();
+
+	return true;
+}
+
+
+
 // 
 LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToCameraSpace(
 	IN lzInt32 depthPointCount,
@@ -432,9 +474,6 @@ LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToCameraSpace(
 	IN lzInt32 cameraPointCount,
 	OUT CameraSpacePoint* cameraSpacePoints)
 {
-
-
-
 
 	return true;
 }
