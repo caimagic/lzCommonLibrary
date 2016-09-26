@@ -23,27 +23,27 @@ endif()
 # 配置一个头文件，通过它向源代码中传递一些CMake设置。
 if (${SetPlatform} MATCHES "Linux64")
 configure_file (
-  "${PROJECT_SOURCE_DIR}/VersionLinux64.h.in"
+  "${PROJECT_SOURCE_DIR}/version/VersionLinux64.h.in"
   "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
 elseif (${SetPlatform} MATCHES "Linux32")
 configure_file (
-  "${PROJECT_SOURCE_DIR}/VersionLinux32.h.in"
+  "${PROJECT_SOURCE_DIR}/version/VersionLinux32.h.in"
   "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
 elseif (${SetPlatform} MATCHES "Windows64")
 configure_file (
-  "${PROJECT_SOURCE_DIR}/VersionWindows64.h.in"
+  "${PROJECT_SOURCE_DIR}/version/VersionWindows64.h.in"
   "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
 elseif (${SetPlatform} MATCHES "Windows32")
 configure_file (
-  "${PROJECT_SOURCE_DIR}/VersionWindows32.h.in"
+  "${PROJECT_SOURCE_DIR}/version/VersionWindows32.h.in"
   "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
 else()
 configure_file (
-  "${PROJECT_SOURCE_DIR}/VersionWindows32.h.in"
+  "${PROJECT_SOURCE_DIR}/version/VersionWindows32.h.in"
   "${PROJECT_SOURCE_DIR}/include/Version.h"
   )
 endif()
