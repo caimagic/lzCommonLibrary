@@ -113,9 +113,9 @@ typedef struct
 
 typedef struct
 {
-	lzFloat32 r;
-	lzFloat32 g;
-	lzFloat32 b;
+	lzUInt8 r;
+	lzUInt8 g;
+	lzUInt8 b;
 } lzRGB;
 
 typedef struct
@@ -130,7 +130,7 @@ typedef struct
 {
 	lzUInt16 width;
 	lzUInt16 height;
-} lzImgSize;
+} lzMatSize;
 
 typedef struct
 {

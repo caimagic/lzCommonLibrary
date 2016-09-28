@@ -1,12 +1,16 @@
 // LZ_KinectDriver.cpp : 定义 DLL 应用程序的导出函数。
 //
 #include <memory>
+#include <iostream>
 #include "KinectDriver.h"
 #include "kinectCapture.h"
 #include "g3log/g3log.hpp"
 #include "g3log/logworker.hpp"
 #include <io.h>
 #include "direct.h"
+#include "tbb/task_scheduler_init.h" 
+#include "tbb/blocked_range.h" 
+#include "tbb/parallel_for.h" 
 
 std::unique_ptr<CKinectDriver> kinectDriver;
 std::unique_ptr<g3::LogWorker> worker;
@@ -18,7 +22,8 @@ const std::string path_to_log_file = ".//log//";
 const std::string path_to_log_file = "/tmp/";
 #endif
 
-CKinectDriver::CKinectDriver()
+CKinectDriver::CKinectDriver():
+	bFrameUpdateFlag(false)
 {
 	pCapture = new KinectCapture();
 	pColor = new lzRGBX[KINECT_DRIVER_COLOR_WIDTH * KINECT_DRIVER_COLOR_HEIGHT];
@@ -30,26 +35,37 @@ CKinectDriver::CKinectDriver()
 	colorWidth	= KINECT_DRIVER_COLOR_WIDTH;
 	depthHeight = KINECT_DRIVER_DEPTH_HEIGHT;
 	depthWidth	= KINECT_DRIVER_DEPTH_WIDTH;
+	
 	mode = Kinect_Driver_Mesh_Model::NONE;
+
+	tbb::task_scheduler_init init;
 }
 
 CKinectDriver::~CKinectDriver()
 {
+	LOGF(WARNING, "enter CKinectDriver::~CKinectDriver");
 	if (pCapture != nullptr)
 	{
+		pCapture->Release();
 		delete pCapture;
 	}
 
 	if (pColor != nullptr)
 	{
-		delete pColor;
+		delete[] pColor;
 	}
 
 	if (pDepth != nullptr)
 	{
-		delete pDepth;
+		delete[] pDepth;
+	}
+
+	if (pBodyIndex != nullptr)
+	{
+		delete[] pBodyIndex;
 	}
 }
+
 
 lzBool CKinectDriver::OpenSensor()
 {
@@ -70,7 +86,33 @@ lzBool CKinectDriver::OpenSensor()
 lzBool CKinectDriver::UpdateFrame()
 {
 	lzBool ret = true;
+	bFrameUpdateFlag = false;
+
 	ret = pCapture->AcquireFrame();
+	if (ret == true)
+	{
+		bFrameUpdateFlag = true;
+	}
+
+	for (int i = 0; i < KINECT_DRIVER_COLOR_HEIGHT; i++)
+	{
+		for (int j = 0; j < KINECT_DRIVER_COLOR_WIDTH; j++)
+		{
+			pColor[i*KINECT_DRIVER_COLOR_WIDTH + j].r = pCapture->pColorRGBX[i*KINECT_DRIVER_COLOR_WIDTH + j].r;
+			pColor[i*KINECT_DRIVER_COLOR_WIDTH + j].g = pCapture->pColorRGBX[i*KINECT_DRIVER_COLOR_WIDTH + j].g;
+			pColor[i*KINECT_DRIVER_COLOR_WIDTH + j].b = pCapture->pColorRGBX[i*KINECT_DRIVER_COLOR_WIDTH + j].b;
+		}
+	}
+
+	for (int i = 0; i < KINECT_DRIVER_DEPTH_HEIGHT; i++)
+	{
+		for (int j = 0; j < KINECT_DRIVER_DEPTH_WIDTH; j++)
+		{
+			pDepth[i*KINECT_DRIVER_DEPTH_WIDTH + j] = pCapture->pDepth[i*KINECT_DRIVER_DEPTH_WIDTH + j];
+			pBodyIndex[i*KINECT_DRIVER_DEPTH_WIDTH + j] = pCapture->pBodyIndex[i*KINECT_DRIVER_DEPTH_WIDTH + j];
+		}
+	}
+
 	return ret;
 }
 
@@ -117,8 +159,9 @@ lzInt32 CKinectDriver::CreateModule(void)
 	lzPoint3f p0, p1, p2, p3;
 	lzPoint2f uv0, uv1, uv2, uv3;
 
-	lzInt32 step = 5;
+	lzInt32 step = 3;
 	lzInt32 index[4] = { 0, 0, 0, 0 };
+
 	for (lzInt32 i = 0; i < pCapture->nDepthFrameHeight - step; i += step)
 	{
 		for (lzInt32 j = 0; j < pCapture->nDepthFrameWidth - step; j += step)
@@ -193,22 +236,59 @@ lzInt32 CKinectDriver::CreateModule(void)
 				tri_count_flag++;
 			}
 
-			/* 取1 2 3点画三角形 */
-			if ((abs(p1.z - p2.z) < z_th) && (abs(p1.z - p3.z) < z_th) && (abs(p2.z - p3.z) < z_th))
+			/* 取2 3 0点画三角形 */
+			if ((abs(p2.z - p3.z) < z_th) && (abs(p3.z - p0.z) < z_th) && (abs(p0.z - p2.z) < z_th))
 			{
-				meshUnit.p0 = p1;
-				meshUnit.p1 = p2;
-				meshUnit.p2 = p3;
+				meshUnit.p0 = p2;
+				meshUnit.p1 = p3;
+				meshUnit.p2 = p0;
 
-				meshUnit.uv0.x = uv1.x / (lzFloat32)pCapture->nColorFrameWidth;
-				meshUnit.uv0.y = uv1.y / (lzFloat32)pCapture->nColorFrameHeight;
-				meshUnit.uv1.x = uv2.x / (lzFloat32)pCapture->nColorFrameWidth;
-				meshUnit.uv1.y = uv2.y / (lzFloat32)pCapture->nColorFrameHeight;
-				meshUnit.uv2.x = uv3.x / (lzFloat32)pCapture->nColorFrameWidth;
-				meshUnit.uv2.y = uv3.y / (lzFloat32)pCapture->nColorFrameHeight;
+				meshUnit.uv0.x = uv2.x / (lzFloat32)pCapture->nColorFrameWidth;
+				meshUnit.uv0.y = uv2.y / (lzFloat32)pCapture->nColorFrameHeight;
+				meshUnit.uv1.x = uv3.x / (lzFloat32)pCapture->nColorFrameWidth;
+				meshUnit.uv1.y = uv3.y / (lzFloat32)pCapture->nColorFrameHeight;
+				meshUnit.uv2.x = uv0.x / (lzFloat32)pCapture->nColorFrameWidth;
+				meshUnit.uv2.y = uv0.y / (lzFloat32)pCapture->nColorFrameHeight;
 
 				vecMeshUnit.push_back(meshUnit);
 				tri_count_flag++;
+			}
+
+			if (!tri_count_flag)
+			{
+				/* 取1 2 3点画三角形 */
+				if ((abs(p1.z - p2.z) < z_th) && (abs(p1.z - p3.z) < z_th) && (abs(p2.z - p3.z) < z_th))
+				{
+					meshUnit.p0 = p1;
+					meshUnit.p1 = p2;
+					meshUnit.p2 = p3;
+
+					meshUnit.uv0.x = uv1.x / (lzFloat32)pCapture->nColorFrameWidth;
+					meshUnit.uv0.y = uv1.y / (lzFloat32)pCapture->nColorFrameHeight;
+					meshUnit.uv1.x = uv2.x / (lzFloat32)pCapture->nColorFrameWidth;
+					meshUnit.uv1.y = uv2.y / (lzFloat32)pCapture->nColorFrameHeight;
+					meshUnit.uv2.x = uv3.x / (lzFloat32)pCapture->nColorFrameWidth;
+					meshUnit.uv2.y = uv3.y / (lzFloat32)pCapture->nColorFrameHeight;
+
+					vecMeshUnit.push_back(meshUnit);
+				}
+
+				/* 取3 0 1点画三角形 */
+				if ((abs(p3.z - p0.z) < z_th) && (abs(p0.z - p1.z) < z_th) && (abs(p1.z - p3.z) < z_th))
+				{
+					meshUnit.p0 = p3;
+					meshUnit.p1 = p0;
+					meshUnit.p2 = p1;
+
+					meshUnit.uv0.x = uv3.x / (lzFloat32)pCapture->nColorFrameWidth;
+					meshUnit.uv0.y = uv3.y / (lzFloat32)pCapture->nColorFrameHeight;
+					meshUnit.uv1.x = uv0.x / (lzFloat32)pCapture->nColorFrameWidth;
+					meshUnit.uv1.y = uv0.y / (lzFloat32)pCapture->nColorFrameHeight;
+					meshUnit.uv2.x = uv1.x / (lzFloat32)pCapture->nColorFrameWidth;
+					meshUnit.uv2.y = uv1.y / (lzFloat32)pCapture->nColorFrameHeight;
+
+					vecMeshUnit.push_back(meshUnit);
+				}
 			}
 		}
 	}
@@ -300,6 +380,9 @@ LZ_EXPORTS_C lzBool lzKinectDriverOpenSensor(void)
 */
 LZ_EXPORTS_C lzBool lzKinectDriverCloseSensor(void)
 {
+	kinectDriver.release();
+	worker.release();
+	handle.release();
 	kinectDriver = nullptr;
 	worker = nullptr;
 	handle = nullptr;
@@ -323,16 +406,15 @@ LZ_EXPORTS_C lzBool lzKinectDriverGetParameter(OUT Kinect_Driver_Para_Type* para
 //
 LZ_EXPORTS_C lzBool lzKinectDriverUpdateFrame()
 {
-	lzBool ret = true;
+	lzBool ret = false;
 	ret = kinectDriver->UpdateFrame();
 	return ret;
 }
 
 //
-LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame)
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT lzRGB* colorFrame)
 {
-	if ((kinectDriver->colorHeight != KINECT_DRIVER_COLOR_HEIGHT) 
-		|| (kinectDriver->colorWidth != KINECT_DRIVER_COLOR_WIDTH))
+	if (kinectDriver->bFrameUpdateFlag == false)
 	{
 		return false;
 	}
@@ -342,16 +424,9 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Fram
 	{
 		for (lzInt32 j = 0; j < kinectDriver->colorWidth; j++)
 		{
-			// careful, there efficiency maybe low
-			kinectDriver->pColor[index].r = kinectDriver->pCapture->pColorRGBX[index].r;
-			kinectDriver->pColor[index].g = kinectDriver->pCapture->pColorRGBX[index].g;
-			kinectDriver->pColor[index].b = kinectDriver->pCapture->pColorRGBX[index].b;
-			kinectDriver->pColor[index].x = kinectDriver->pCapture->pColorRGBX[index].x;
-
-			colorFrame->frame[index].r = kinectDriver->pColor[index].r;
-			colorFrame->frame[index].g = kinectDriver->pColor[index].g;
-			colorFrame->frame[index].b = kinectDriver->pColor[index].b;
-
+			colorFrame[index].r = kinectDriver->pColor[index].r;
+			colorFrame[index].g = kinectDriver->pColor[index].g;
+			colorFrame[index].b = kinectDriver->pColor[index].b;
 			index++;
 		}
 	}
@@ -362,6 +437,11 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Fram
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame)
 {
+	if (kinectDriver->bFrameUpdateFlag == false)
+	{
+		return false;
+	}
+
 	if ((kinectDriver->depthHeight != KINECT_DRIVER_DEPTH_HEIGHT)
 		|| (kinectDriver->depthWidth != KINECT_DRIVER_DEPTH_WIDTH))
 	{
@@ -387,6 +467,11 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Fram
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIndex_Frame_Type* bodyIndexFrame)
 {
+	if (kinectDriver->bFrameUpdateFlag == false)
+	{
+		return false;
+	}
+
 	if ((kinectDriver->depthHeight != KINECT_DRIVER_DEPTH_HEIGHT)
 		|| (kinectDriver->depthWidth != KINECT_DRIVER_DEPTH_WIDTH))
 	{
@@ -420,15 +505,27 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIn
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* frame)
 {
-	lzKinectDriverAcquireColorFrame(&frame->color);
-	lzKinectDriverAcquireDepthFrame(&frame->depth);
-	lzKinectDriverAcquireBodyIndexFrame(&frame->bodyIndex);
+//	lzBool retColorFrame = lzKinectDriverAcquireColorFrame(&frame->color);
+//	lzBool retDepthFrame = lzKinectDriverAcquireDepthFrame(&frame->depth);
+//	lzBool retBodyIndexFrame = lzKinectDriverAcquireBodyIndexFrame(&frame->bodyIndex);
+
+//	if ((retColorFrame == false)||(retDepthFrame == false)||(retBodyIndexFrame == false))
+//	{
+//		LOGF(WARNING, "ret color %d depth %d BodyIndex %d", retColorFrame, retDepthFrame, retBodyIndexFrame);
+//		return false;
+//	}
+
 	return true;
 }
 
 //
-LZ_EXPORTS_C lzBool lzKinectDriverSaveRawData(IN string filename)
+LZ_EXPORTS_C lzBool lzKinectDriverWriteRawData(IN string filename)
 {
+	if (kinectDriver->bFrameUpdateFlag == false)
+	{
+		return false;
+	}
+
 	CMMAPFile* pMMAPFile = new CMMAPFile();
 	unsigned long size_low = kinectDriver->colorHeight*kinectDriver->colorWidth * sizeof(lzRGBX);
 	size_low += kinectDriver->depthHeight*kinectDriver->depthWidth * sizeof(lzInt32);
@@ -447,7 +544,7 @@ LZ_EXPORTS_C lzBool lzKinectDriverSaveRawData(IN string filename)
 		for (int j = 0; j < kinectDriver->colorWidth; j++)
 		{
 			*ptrColor = kinectDriver->pColor[i*kinectDriver->colorWidth + j];
-			ptrColor++;
+			ptrColor++;			
 		}
 	}
 
@@ -460,11 +557,62 @@ LZ_EXPORTS_C lzBool lzKinectDriverSaveRawData(IN string filename)
 			ptrDepth++;
 		}
 	}
+	
 	pMMAPFile->MMAP_Release();
+	delete pMMAPFile;
 
 	return true;
 }
 
+//
+LZ_EXPORTS_C lzBool lzKinectDriverReadRawData(IN string filename, lzRGBX** ptrColor, lzInt32** ptrDepth, lzMatSize colorSize, lzMatSize depthSize)
+{
+	// check file exists
+	if ((_access(filename.c_str(), 0)) == -1)
+	{
+		LOGF(WARNING, "file %s is not exist.", filename.c_str());
+		return false;
+	}
+
+	CMMAPFile* pMMAPFile = new CMMAPFile();
+	unsigned long size_low = colorSize.height*colorSize.width * sizeof(lzRGBX);
+	size_low += depthSize.height*depthSize.width * sizeof(lzInt32);
+	unsigned long size_high = 0;
+
+	char* pvFile = (char*)pMMAPFile->MMAP_CreateFile(filename, CMMAPFILE_OPEN_EXISTING, 0, size_low, size_high);
+	if (NULL == pvFile)
+	{
+		LOGF(WARNING, "open file fail %s", filename.c_str());
+		return false;
+	}
+
+	*ptrColor = new lzRGBX[colorSize.height*colorSize.width];
+	*ptrDepth = new lzInt32[depthSize.height*depthSize.width];
+	lzRGBX* pColor = *ptrColor;
+	lzInt32* pDepth = *ptrDepth;
+
+	lzRGBX* ptr1 = (lzRGBX*)pvFile;
+	for (int i = 0; i < colorSize.height; i++)
+	{
+		for (int j = 0; j < colorSize.width; j++)
+		{
+			*pColor = ptr1[i*colorSize.width + j];
+			pColor++;
+		}
+	}
+
+	lzInt32* ptr2 = (lzInt32*)(pvFile + colorSize.height*colorSize.width * sizeof(lzRGBX));
+	for (int i = 0; i < depthSize.height; i++)
+	{
+		for (int j = 0; j < depthSize.width; j++)
+		{
+			*pDepth = ptr2[i*depthSize.width + j];
+			pDepth++;
+		}
+	}
+
+	return true;
+}
 
 
 // 
@@ -525,11 +673,20 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireMeshCount(OUT lzInt32* count)
 	return true;
 }
 
+
 //
-LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh)
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(IN lzInt32 count, OUT lzMeshUnitType* mesh)
 {
+	lzInt32 meshSize = kinectDriver->vecMeshUnit.size();
+	if (count != meshSize)
+	{
+		return false;
+	}
 
-
+	for (int i = 0; i < count; i++)
+	{
+		memcpy(&(mesh[i]), &(kinectDriver->vecMeshUnit[i]), sizeof(lzMeshUnitType));
+	}
 
 	return true;
 }

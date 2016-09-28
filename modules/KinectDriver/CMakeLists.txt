@@ -72,6 +72,14 @@ elseif (${SetPlatform} MATCHES "Windows64")
 		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
 	endforeach()
 	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/tbb/lib/x64)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
+	
 elseif (${SetPlatform} MATCHES "Windows32")
 	
 	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/g3log/lib/x86)
@@ -90,6 +98,13 @@ elseif (${SetPlatform} MATCHES "Windows32")
 		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
 	endforeach()
 	
+	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/tbb/lib/x86)
+	link_directories(${LIB_DIR_LIST})
+	foreach(libs ${LIB_DIR_LIST})
+		FILE(GLOB_RECURSE LIB_LIST "${libs}/*[^Static].lib")
+		message(STATUS "lib ${LIB_LIST}")
+		target_link_libraries(${TARGET_NAME} ${LIB_LIST})
+	endforeach()
 else()
 	
 	set(LIB_DIR_LIST ${PROJECT_SOURCE_DIR}/3rdparty/g3log/lib/x86)

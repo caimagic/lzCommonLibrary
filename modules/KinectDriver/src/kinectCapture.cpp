@@ -115,6 +115,7 @@ bool KinectCapture::Release()
 {
 	LOGF(WARNING, "KinectCapture Release");
 
+	pKinectSensor->Close();
 	SafeRelease(pKinectSensor);
 	SafeRelease(pCoordinateMapper);
 	SafeRelease(pMultiSourceFrameReader);

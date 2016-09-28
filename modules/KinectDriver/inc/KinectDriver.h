@@ -97,7 +97,6 @@ typedef struct
 	lzPoint2f uv1;
 	lzPoint2f uv2;
 	lzPoint2f uv3;
-	lzUInt32 index;
 } Kinect_Driver_Mesh_Type;
 
 /********************************************************************************************/
@@ -108,6 +107,7 @@ class LZ_EXPORTS_API CKinectDriver
 public:
 	CKinectDriver();
 	~CKinectDriver();
+	void release();
 
 	lzBool OpenSensor(void);
 	lzBool UpdateFrame(void);
@@ -126,7 +126,8 @@ public:
 	lzInt32 depthWidth;
 	Kinect_Driver_Mesh_Model mode;
 	std::vector<lzMeshUnitType> vecMeshUnit;
-	
+
+	lzBool bFrameUpdateFlag;
 private:
 
 };
@@ -164,7 +165,7 @@ LZ_EXPORTS_C lzBool lzKinectDriverGetParameter(OUT Kinect_Driver_Para_Type* para
 LZ_EXPORTS_C lzBool lzKinectDriverUpdateFrame();
 
 //
-LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT Kinect_Driver_Color_Frame_Type* colorFrame);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireColorFrame(OUT lzRGB* colorFrame);
 
 //
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireDepthFrame(OUT Kinect_Driver_Depth_Frame_Type* depthFrame);
@@ -176,7 +177,10 @@ LZ_EXPORTS_C lzBool lzKinectDriverAcquireBodyIndexFrame(OUT Kinect_Driver_BodyIn
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireFrame(OUT Kinect_Driver_Frame_Type* frame);
 
 //
-LZ_EXPORTS_C lzBool lzKinectDriverSaveRawData(IN string filename);
+LZ_EXPORTS_C lzBool lzKinectDriverWriteRawData(IN string filename);
+
+//
+LZ_EXPORTS_C lzBool lzKinectDriverReadRawData(IN string filename, lzRGBX** ptrColor, lzInt32** ptrDepth, lzMatSize colorSize, lzMatSize depthSize);
 
 // 
 LZ_EXPORTS_C lzBool lzKinectDriverMapDepthFrameToCameraSpace(
@@ -210,7 +214,7 @@ LZ_EXPORTS_C lzBool lzKinectDriverMapColorFrameToDepthSpace(
 LZ_EXPORTS_C lzBool lzKinectDriverAcquireMeshCount(OUT lzInt32* count);
 
 //
-LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(OUT Kinect_Driver_Mesh_Type* mesh);
+LZ_EXPORTS_C lzBool lzKinectDriverAcquireModel(IN lzInt32 count, OUT lzMeshUnitType* mesh);
 
 //
 LZ_EXPORTS_C lzInt32 lzKinectDriverReadMMAPFileCount(lzUInt32 framecount);
